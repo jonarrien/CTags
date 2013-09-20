@@ -600,7 +600,7 @@ class ShowSymbols(sublime_plugin.TextCommand):
         def get_tags():
             loaded = TagFile(tags_file, FILENAME)
             if lang: return loaded.get_tags_dict_by_suffix(suffix, filters=compile_filters(view))
-            else: 
+            else:
                 return loaded.get_tags_dict(*files, filters=compile_filters(view))
 
         if key in tags_cache[base_path]:
@@ -708,10 +708,10 @@ class CTagsAutoComplete(sublime_plugin.EventListener):
                 tags = []
                 if (not view.window().folders() or not os.path.exists(tags_path)): #check if a project is open and the .tags file exists
                     return tags
-                f=os.popen("awk '{ print $1 }' '" + tags_path + "'")
+                f=os.popen("awk '{ print $1 \" (\" $NF \")\" }' '" + tags_path + "'")
                 for i in f.readlines():
                     tags.append([i.strip()])
-                tags = [(item,item) for sublist in tags for item in sublist] #flatten
+                tags = [(item,re.sub(r'(.*)\s\(.*', r'\1', item)) for sublist in tags for item in sublist] #flatten
                 tags = list(set(tags)) # make unique
                 tags.sort()
                 GetAllCTagsList.ctags_list = tags
